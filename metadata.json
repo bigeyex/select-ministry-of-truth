@@ -1,0 +1,5 @@
+{
+  "name": "SELECT: Ministry of Truth",
+  "description": "A 1984-themed SQL puzzle game where you play as a data analyst for Big Brother. Construct queries to uncover thought crimes, but beware—your choices determine your fate.",
+  "requestFramePermissions": []
+}
