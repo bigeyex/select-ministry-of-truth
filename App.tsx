@@ -14,7 +14,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [endingNarrative, setEndingNarrative] = useState<string>('');
   const [endingType, setEndingType] = useState<string>('');
-  
+
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const currentLevel = LEVELS[levelIndex];
@@ -43,9 +43,9 @@ export default function App() {
 
   // Auto-scroll to bottom of query buffer when adding tokens
   useEffect(() => {
-     if (bottomRef.current) {
-        bottomRef.current.scrollTop = bottomRef.current.scrollHeight;
-     }
+    if (bottomRef.current) {
+      bottomRef.current.scrollTop = bottomRef.current.scrollHeight;
+    }
   }, [queryTokens]);
 
   const handleAddToken = (token: string) => {
@@ -82,7 +82,7 @@ export default function App() {
 
     // STANDARD LEVEL LOGIC (Regex Driven)
     let isSuccess = false;
-    
+
     if (currentLevel.validPattern) {
       // Create a regex from the pattern, case insensitive
       const regex = new RegExp(currentLevel.validPattern, 'i');
@@ -92,7 +92,7 @@ export default function App() {
     } else {
       // Fallback for extremely simple "Contains all tokens" logic if no regex provided
       const allRequiredPresent = currentLevel.expectedResultIds.length > 0; // Naive fallback
-      if (allRequiredPresent) isSuccess = true; 
+      if (allRequiredPresent) isSuccess = true;
     }
 
     // Generate narrative
@@ -155,7 +155,7 @@ export default function App() {
               <Typewriter text={endingNarrative} speed={30} />
             </p>
           </div>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-6 py-2 border border-crt-green hover:bg-crt-green hover:text-black font-mono transition-all w-full"
           >
@@ -171,7 +171,7 @@ export default function App() {
       {/* Global CRT Effects */}
       <div className="scanlines"></div>
       <div className="crt-overlay"></div>
-      
+
       {/* Header */}
       <header className="flex-none flex justify-between items-center p-2 border-b border-crt-green-dim z-10 bg-crt-black/90 backdrop-blur">
         <div className="flex items-center gap-2">
@@ -187,20 +187,22 @@ export default function App() {
       {/* Main Workspace - Scrollable Top Section */}
       <main className="flex-1 overflow-y-auto z-10 scrollbar-hide">
         <div className="p-4 space-y-4 max-w-3xl mx-auto pb-32"> {/* pb-32 to account for fixed bottom */}
-          
+
           <Terminal className="min-h-[200px]">
-            {gameState === 'BRIEFING' && (
-               <div className="space-y-4 animate-flicker">
-                 <h2 className="text-xl font-bold border-b border-crt-green-dim pb-2">{currentLevel.title}</h2>
-                 <p className="text-crt-green/90 text-lg leading-relaxed"><Typewriter text={currentLevel.briefing} speed={10} /></p>
-                 <button 
-                   onClick={() => setGameState('PLAYING')}
-                   className="mt-6 w-full py-3 border border-crt-green text-crt-green hover:bg-crt-green hover:text-black transition-colors font-bold"
-                 >
-                   确认指令 (ACKNOWLEDGE)
-                 </button>
-               </div>
-            )}
+            {/* Always show Briefing/Title */}
+            <div className="space-y-4 animate-flicker mb-6">
+              <h2 className="text-xl font-bold border-b border-crt-green-dim pb-2">{currentLevel.title}</h2>
+              <p className="text-crt-green/90 text-lg leading-relaxed"><Typewriter text={currentLevel.briefing} speed={10} /></p>
+
+              {gameState === 'BRIEFING' && (
+                <button
+                  onClick={() => setGameState('PLAYING')}
+                  className="mt-6 w-full py-3 border border-crt-green text-crt-green hover:bg-crt-green hover:text-black transition-colors font-bold"
+                >
+                  确认指令 (ACKNOWLEDGE)
+                </button>
+              )}
+            </div>
 
             {(gameState === 'PLAYING' || gameState === 'SUCCESS' || gameState === 'FAILURE') && (
               <div className="space-y-4">
@@ -208,43 +210,43 @@ export default function App() {
                   <span className="text-sm text-crt-green-dim">目标数据 (TARGET DATA)</span>
                   <span className="text-xs text-crt-green-dim animate-pulse">实时传输 (LIVE FEED)</span>
                 </div>
-                
+
                 {/* Primary Table */}
-                <Table 
-                  data={currentLevel.data} 
+                <Table
+                  data={currentLevel.data}
                   highlightIds={gameState === 'SUCCESS' ? currentLevel.expectedResultIds : []}
                 />
 
                 {/* Secondary Table (For Joins) */}
                 {currentLevel.secondaryData && (
                   <>
-                     <div className="flex justify-between items-center border-b border-crt-green-dim pb-1 mt-4">
+                    <div className="flex justify-between items-center border-b border-crt-green-dim pb-1 mt-4">
                       <span className="text-sm text-crt-green-dim">参考数据 (REFERENCE DATA)</span>
                     </div>
                     {/* @ts-ignore - Table generic type handling shortcut */}
                     <Table data={currentLevel.secondaryData} />
                   </>
                 )}
-                
+
                 {feedback && (
                   <div className={`mt-4 p-3 border ${gameState === 'SUCCESS' ? 'border-crt-green bg-crt-green/10' : 'border-red-500 bg-red-900/20'} rounded`}>
-                     <div className="flex items-start gap-2">
-                        {gameState === 'FAILURE' && <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />}
-                        <p className={gameState === 'FAILURE' ? 'text-red-400' : 'text-crt-green'}>
-                          <span className="font-bold">监察官: </span>
-                          <Typewriter text={feedback} speed={20} />
-                        </p>
-                     </div>
-                     {gameState === 'SUCCESS' && (
-                       <button onClick={nextLevel} className="mt-2 w-full py-2 bg-crt-green/20 hover:bg-crt-green/40 text-sm font-bold border border-crt-green/50">
-                         下一项任务 &gt;&gt;
-                       </button>
-                     )}
-                     {gameState === 'FAILURE' && (
-                       <button onClick={retry} className="mt-2 w-full py-2 bg-red-900/20 hover:bg-red-900/40 text-sm font-bold border border-red-500/50 text-red-400">
-                         重试 &gt;&gt;
-                       </button>
-                     )}
+                    <div className="flex items-start gap-2">
+                      {gameState === 'FAILURE' && <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />}
+                      <p className={gameState === 'FAILURE' ? 'text-red-400' : 'text-crt-green'}>
+                        <span className="font-bold">监察官: </span>
+                        <Typewriter text={feedback} speed={20} />
+                      </p>
+                    </div>
+                    {gameState === 'SUCCESS' && (
+                      <button onClick={nextLevel} className="mt-2 w-full py-2 bg-crt-green/20 hover:bg-crt-green/40 text-sm font-bold border border-crt-green/50">
+                        下一项任务 &gt;&gt;
+                      </button>
+                    )}
+                    {gameState === 'FAILURE' && (
+                      <button onClick={retry} className="mt-2 w-full py-2 bg-red-900/20 hover:bg-red-900/40 text-sm font-bold border border-red-500/50 text-red-400">
+                        重试 &gt;&gt;
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -256,13 +258,13 @@ export default function App() {
       {/* Bottom Controls - Fixed Sticky Footer */}
       <section className="flex-none border-t-2 border-crt-green-dim bg-crt-black shadow-[0_-5px_20px_rgba(26,128,26,0.2)] z-20">
         <div className="max-w-3xl mx-auto p-2">
-          
+
           {/* Query Buffer (Compact) */}
           <div className="flex gap-2 mb-2 items-start">
-             <div 
-               ref={bottomRef}
-               className="flex-1 bg-black border border-crt-green-dim/50 h-14 p-2 font-mono text-base text-white overflow-y-auto rounded shadow-inner relative leading-tight"
-             >
+            <div
+              ref={bottomRef}
+              className="flex-1 bg-black border border-crt-green-dim/50 h-14 p-2 font-mono text-base text-white overflow-y-auto rounded shadow-inner relative leading-tight"
+            >
               <span className="text-crt-green mr-1">&gt;</span>
               {queryTokens.map((token, i) => (
                 <span key={i} className="inline-block mr-1.5 text-crt-green">
@@ -271,19 +273,19 @@ export default function App() {
               ))}
               <span className="inline-block w-1.5 h-4 bg-crt-green animate-pulse align-middle ml-1"></span>
             </div>
-            
+
             <div className="flex flex-col gap-1">
-              <button 
-                onClick={handleRemoveLastToken} 
+              <button
+                onClick={handleRemoveLastToken}
                 disabled={gameState !== 'PLAYING' || queryTokens.length === 0}
-                className="p-2 border border-crt-green-dim/50 rounded hover:bg-red-900/30 text-crt-green disabled:opacity-30" 
+                className="p-2 border border-crt-green-dim/50 rounded hover:bg-red-900/30 text-crt-green disabled:opacity-30"
               >
                 <Delete className="w-4 h-4" />
               </button>
-              <button 
-                onClick={handleClear} 
+              <button
+                onClick={handleClear}
                 disabled={gameState !== 'PLAYING' || queryTokens.length === 0}
-                className="p-2 border border-crt-green-dim/50 rounded hover:bg-crt-green/20 text-crt-green disabled:opacity-30" 
+                className="p-2 border border-crt-green-dim/50 rounded hover:bg-crt-green/20 text-crt-green disabled:opacity-30"
               >
                 <RefreshCw className="w-4 h-4" />
               </button>
@@ -318,8 +320,8 @@ export default function App() {
               w-full py-3 flex items-center justify-center gap-2
               font-bold text-lg uppercase tracking-widest border-2
               transition-all duration-200
-              ${loading 
-                ? 'border-crt-green-dim text-crt-green-dim cursor-wait' 
+              ${loading
+                ? 'border-crt-green-dim text-crt-green-dim cursor-wait'
                 : 'border-crt-green bg-crt-green/10 text-crt-green hover:bg-crt-green hover:text-black'
               }
               disabled:opacity-50 disabled:cursor-not-allowed
