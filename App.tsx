@@ -194,6 +194,12 @@ export default function App() {
               <h2 className="text-xl font-bold border-b border-crt-green-dim pb-2">{currentLevel.title}</h2>
               <p className="text-crt-green/90 text-lg leading-relaxed"><Typewriter text={currentLevel.briefing} speed={10} /></p>
 
+              {currentLevel.guide && (
+                <div className="mt-4 p-3 border-l-2 border-crt-green-dim bg-crt-green/5 text-crt-green-dim text-sm font-mono whitespace-pre-wrap">
+                  {currentLevel.guide}
+                </div>
+              )}
+
               {gameState === 'BRIEFING' && (
                 <button
                   onClick={() => setGameState('PLAYING')}

@@ -21,11 +21,12 @@ export interface Level {
   data: Citizen[];
   secondaryData?: Department[]; // Support for JOIN levels showing a second table
   tokens: string[];
-  expectedResultIds: number[]; 
+  expectedResultIds: number[];
   sqlConcept: string;
   // Regex string to validate the user's constructed query
-  validPattern?: string; 
+  validPattern?: string;
   isCritical?: boolean;
+  guide?: string;
 }
 
 export type GameState = 'BOOT' | 'BRIEFING' | 'PLAYING' | 'SUCCESS' | 'FAILURE' | 'ENDING';
